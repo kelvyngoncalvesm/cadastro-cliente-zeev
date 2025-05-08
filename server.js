@@ -5,48 +5,38 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.post("/cadastros", (req, res) => {
-  const dados = req.body;
-  const stmt = db.prepare(`
-    INSERT INTO cadastros (
-      empreendimento, nomecompleto1, datanascimento1, profissao1, contato1, cpf1, rg1, estadocivil1,
-      temconjugue, nomecompleto2, datanascimento2, profissao2, contato2, cpf2, rg2, estadocivil2,
-      rua, casanumero, bairro, cidadeuf, cep
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  stmt.run([
-    dados.empreendimento,
-    dados.nomecompleto1,
-    dados.datanascimento1,
-    dados.profissao1,
-    dados.contato1,
-    dados.cpf1,
-    dados.rg1,
-    dados.estadocivil1,
-    dados.temconjugue,
-    dados.nomecompleto2,
-    dados.datanascimento2,
-    dados.profissao2,
-    dados.contato2,
-    dados.cpf2,
-    dados.rg2,
-    dados.estadocivil2,
-    dados.rua,
-    dados.casanumero,
-    dados.bairro,
-    dados.cidadeuf,
-    dados.cep
-  ]);
-  stmt.finalize();
-  res.json({ success: true });
+const pool = require('./db');
+
+app.post("/cadastros", async (req, res) => {
+  const d = req.body;
+  try {
+    await pool.query(`
+      INSERT INTO cadastros (
+        empreendimento, nomecompleto1, datanascimento1, profissao1, contato1, cpf1, rg1, estadocivil1,
+        temconjugue, nomecompleto2, datanascimento2, profissao2, contato2, cpf2, rg2, estadocivil2,
+        rua, casanumero, bairro, cidadeuf, cep
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+    `, [
+      d.empreendimento, d.nomecompleto1, d.datanascimento1, d.profissao1, d.contato1, d.cpf1,
+      d.rg1, d.estadocivil1, d.temconjugue, d.nomecompleto2, d.datanascimento2, d.profissao2,
+      d.contato2, d.cpf2, d.rg2, d.estadocivil2, d.rua, d.casanumero, d.bairro, d.cidadeuf, d.cep
+    ]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao inserir no banco de dados." });
+  }
 });
 
-app.get("/cadastros", (req, res) => {
-  db.all("SELECT * FROM cadastros", [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+app.get("/cadastros", async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM cadastros");
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar cadastros." });
+    }
   });
-});
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

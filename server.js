@@ -8,25 +8,26 @@ app.use(express.json());
 const pool = require('./db');
 
 app.post("/cadastros", async (req, res) => {
-  const d = req.body;
-  try {
-    await pool.query(`
-      INSERT INTO cadastros (
-        empreendimento, nomecompleto1, datanascimento1, profissao1, contato1, cpf1, rg1, estadocivil1,
-        temconjugue, nomecompleto2, datanascimento2, profissao2, contato2, cpf2, rg2, estadocivil2,
-        rua, casanumero, bairro, cidadeuf, cep
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
-    `, [
-      d.empreendimento, d.nomecompleto1, d.datanascimento1, d.profissao1, d.contato1, d.cpf1,
-      d.rg1, d.estadocivil1, d.temconjugue, d.nomecompleto2, d.datanascimento2, d.profissao2,
-      d.contato2, d.cpf2, d.rg2, d.estadocivil2, d.rua, d.casanumero, d.bairro, d.cidadeuf, d.cep
-    ]);
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao inserir no banco de dados." });
-  }
-});
+    const d = req.body;
+    try {
+      await pool.query(`
+        INSERT INTO cadastros (
+          empreendimento, nomecompleto1, datanascimento1, profissao1, contato1, cpf1, rg1, estadocivil1,
+          temconjugue, nomecompleto2, datanascimento2, profissao2, contato2, cpf2, rg2, estadocivil2,
+          rua, casanumero, bairro, cidadeuf, cep
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+      `, [
+        d.empreendimento, d.nomecompleto1, d.datanascimento1, d.profissao1, d.contato1, d.cpf1,
+        d.rg1, d.estadocivil1, d.temconjugue, d.nomecompleto2, d.datanascimento2, d.profissao2,
+        d.contato2, d.cpf2, d.rg2, d.estadocivil2, d.rua, d.casanumero, d.bairro, d.cidadeuf, d.cep
+      ]);
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Erro detalhado:", err); // <-- adiciona essa linha
+      res.status(500).json({ error: err.message }); // <-- exibe o erro real
+    }
+  });
+  
 
 app.get("/cadastros", async (req, res) => {
     try {

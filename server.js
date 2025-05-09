@@ -18,7 +18,7 @@ app.post("/cadastros", async (req, res) => {
     );
 
     if (existente.rows.length > 0) {
-      return res.status(409).json({
+      return res.status(200).json({
         statuscadastro: "Status: Erro - Duplicidade no cadastro",
         mensagemcadastro: "Mensagem: Verifique se este cliente já está cadastrado para o empreendimento em tela. Ou caso deseje editar clique em avançar para editar os dados do cliente."
       });

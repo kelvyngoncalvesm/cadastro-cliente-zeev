@@ -55,7 +55,33 @@ app.post("/cadastros", async (req, res) => {
 
 app.get("/cadastros", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM cadastros LIMIT 50");
+    const { cpf1, nomecompleto1, empreendimento } = req.query;
+
+    const filtros = [];
+    const valores = [];
+
+    if (cpf1) {
+      filtros.push("REPLACE(REPLACE(cpf1, '.', ''), '-', '') = REPLACE(REPLACE($" + (valores.length + 1) + ", '.', ''), '-', '')");
+      valores.push(cpf1);
+    }
+
+    if (nomecompleto1) {
+      filtros.push("nomecompleto1 ILIKE $" + (valores.length + 1));
+      valores.push(`%${nomecompleto1}%`);
+    }
+
+    if (empreendimento) {
+      filtros.push("empreendimento ILIKE $" + (valores.length + 1));
+      valores.push(`%${empreendimento}%`);
+    }
+
+    let sql = "SELECT * FROM cadastros";
+    if (filtros.length > 0) {
+      sql += " WHERE " + filtros.join(" AND ");
+    }
+    sql += " LIMIT 50";
+
+    const result = await pool.query(sql, valores);
     res.json(result.rows);
   } catch (err) {
     console.error("Erro na consulta GET:", err);

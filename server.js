@@ -55,13 +55,14 @@ app.post("/cadastros", async (req, res) => {
 
 app.get("/cadastros", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM cadastros");
+    const result = await pool.query("SELECT * FROM cadastros LIMIT 50");
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("Erro na consulta GET:", err);
     res.status(500).json({ error: "Erro ao buscar cadastros." });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
